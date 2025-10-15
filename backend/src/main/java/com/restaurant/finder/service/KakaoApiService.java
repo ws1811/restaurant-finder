@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.restaurant.finder.dto.KakaoApiResponse;
+
 @Service
 public class KakaoApiService {
     
@@ -16,7 +18,7 @@ public class KakaoApiService {
     
     private static final String KAKAO_API_URL = "https://dapi.kakao.com/v2/local/search/category.json";
     
-    public String searchNearbyRestaurants(double latitude, double longitude, int radius) {
+    public KakaoApiResponse searchNearbyRestaurants(double latitude, double longitude, int radius) {
         RestTemplate restTemplate = new RestTemplate();
         
         HttpHeaders headers = new HttpHeaders();
@@ -26,7 +28,8 @@ public class KakaoApiService {
                 KAKAO_API_URL, longitude, latitude, radius);
         
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(
+                url, HttpMethod.GET, entity, KakaoApiResponse.class);
         
         return response.getBody();
     }
