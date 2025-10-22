@@ -1,0 +1,65 @@
+name: Backend Deploy
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Create application.properties
+      working-directory: ./backend
+      run: |
+        mkdir -p src/main/resources
+        cat > src/main/resources/application.properties << EOF
+        server.address=0.0.0.0
+        server.port=8080
+        
+        kakao.api.key=${{ secrets.KAKAO_API_KEY }}
+        openweather.api.key=${{ secrets.OPENWEATHER_API_KEY }}
+        gemini.api.key=${{ secrets.GEMINI_API_KEY }}
+        
+        spring.cache.caffeine.spec=maximumSize=100,expireAfterWrite=1800s
+        EOF
+    
+    - name: Grant execute permission for gradlew
+      working-directory: ./backend
+      run: chmod +x gradlew
+    
+    - name: Build with Gradle
+      working-directory: ./backend
+      run: ./gradlew clean build -x test
+    
+    - name: Deploy to EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        
+        scp -i private_key.pem -o StrictHostKeyChecking=no \
+          backend/build/libs/backend-0.0.1-SNAPSHOT.jar \
+          ${USER}@${HOST}:/home/ubuntu/
+        
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ${USER}@${HOST} << 'EOF'
+          pkill -f backend-0.0.1-SNAPSHOT.jar || true
+          nohup java -jar /home/ubuntu/backend-0.0.1-SNAPSHOT.jar > /home/ubuntu/app.log 2>&1 &
+          echo "Application restarted"
+        EOF
+        
+        rm -f private_key.pem
