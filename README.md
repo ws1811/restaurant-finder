@@ -287,6 +287,13 @@ AI 식당 추천
   }
 ```
 
+## 🔄 CI/CD
+
+GitHub Actions를 통한 자동 배포
+
+- **프론트엔드:** `frontend/` 디렉토리 변경 시 자동으로 S3 업로드 및 CloudFront 무효화
+- **백엔드:** `backend/` 디렉토리 변경 시 자동으로 빌드 후 EC2 배포
+
 ---
 
 ## 📊 주요 의사결정
@@ -335,7 +342,6 @@ AI 식당 추천
 - [ ] 카카오맵 연동 (지도 표시)
 - [ ] PWA 지원 (오프라인 모드)
 - [ ] Docker 컨테이너화
-- [ ] CI/CD 파이프라인 구축 (GitHub Actions)
 - [ ] 모니터링 (CloudWatch, Prometheus)
 - [ ] 로드 밸런서 추가 (고가용성)
 
