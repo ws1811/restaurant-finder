@@ -6,7 +6,7 @@ AI 기반 맥락 인식 식당 추천 서비스
 
 위치, 날씨, 인원 수, 메뉴 선호도 등 다양한 맥락 정보를 종합하여 AI가 최적의 식당을 추천해주는 웹 애플리케이션입니다.
 
-**배포 URL:** https://dh16eh1zyeeii.cloudfront.net
+**배포 URL:** https://dh16eh1zyeeii.cloudfront.net <- 현재는 과금청구로 닫아둔 상태입니다
 
 ---
 
